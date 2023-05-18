@@ -1,9 +1,10 @@
 import streamlit as st
 import altair as alt
 import pandas as pd
+import altair_saver
 
 # Define the data
-data = pd.read_csv(r"Apurimac.csv")
+data = pd.read_csv(r"E:\\_02_practicas_region_apurimac\\Tareas_sub gerente(David )\\Tarea_03 - indicadores\\Apurimac.csv")
 
 g_prov = data.groupby("PROVINCIA").sum().reset_index()
 g_dist = data.groupby(["PROVINCIA", "DISTRITO"]).sum().reset_index()
@@ -78,3 +79,5 @@ bar_chart = alt.Chart(chart_data).mark_bar().encode(
 ).properties(width=600, height=400)
 
 st.altair_chart(bar_chart, use_container_width=True)
+
+    

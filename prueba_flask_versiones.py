@@ -522,3 +522,125 @@ plt.legend(loc='upper left', bbox_to_anchor=(1.05, 1))
 
 # Display the district bar chart
 st.pyplot(fig)
+
+#                                     THE 'BUTTON' -TO BE FIXED                              #
+
+def save_chart_as_png(chart, filename):
+    altair_saver.save(chart, filename)
+
+# Display the chart
+st.altair_chart(chart, use_container_width=True)
+
+# Add a button to save the chart as PNG
+if st.button("Save Chart as PNG"):
+    filename = "chart.png"  # You can customize the filename if desired
+    save_chart_as_png(chart, filename)
+    st.success(f"Chart saved as {filename}")
+
+# ... your existing code ...
+
+# Display the bar chart
+st.altair_chart(bar_chart, use_container_width=True)
+
+# Add a button to save the bar chart as PNG
+if st.button("Save Bar Chart as PNG"):
+    filename = "bar_chart.png"  # You can customize the filename if desired
+    save_chart_as_png(bar_chart, filename)
+    st.success(f"Bar chart saved as {filename}")
+
+
+
+
+
+
+
+
+
+    #-----------------------AGUA POTABLE - FUNCIONA --------------------------------#
+    import streamlit as st
+import altair as alt
+import pandas as pd
+import altair_saver
+
+# Define the data
+data = pd.read_csv(r"E:\\_02_practicas_region_apurimac\\Tareas_sub gerente(David )\\Tarea_07_brechas de Saneamiento\\Apurimac_aguapotable.csv")
+
+g_prov_agua = data.groupby("PROVINCIA").sum().reset_index()
+g_dist_agua = data.groupby(["PROVINCIA", "DISTRITO"]).sum().reset_index()
+
+p_con_agua = round(g_prov_agua["VIVIENDAS CON AGUA"] / (g_prov_agua["VIVIENDAS CON AGUA"] + g_prov_agua["VIVIENDAS SIN AGUA"]) * 100, 2)
+p_sin_agua = 100 - p_con_agua
+
+d_con_agua = round(g_dist_agua["VIVIENDAS CON AGUA"] / (g_dist_agua["VIVIENDAS CON AGUA"] + g_dist_agua["VIVIENDAS SIN AGUA"]) * 100, 2)
+d_sin_agua = 100 - d_con_agua
+
+g_prov_agua["% VIVIENDAS CON ACCESO"]   = p_con_agua
+g_prov_agua["% VIVIENDAS SIN ACCESO"]   = p_sin_agua
+g_dist_agua["% VIVIENDAS CON ACCESO"] = d_con_agua
+g_dist_agua["% VIVIENDAS SIN ACCESO"] = d_sin_agua
+
+# Sort the data by "VIVIENDAS CON AGUA %" for province chart
+g_prov_agua = g_prov_agua.sort_values("% VIVIENDAS CON ACCESO")
+
+# Create the main chart using Altair
+chart = (
+    alt.Chart(g_prov_agua)
+    .transform_fold(
+        ["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"],
+        as_=["Estado de acceso", "Porcentaje"],
+    )
+    .mark_bar()
+    .encode(
+        y=alt.Y("PROVINCIA:N", sort="-x"),
+        x=alt.X("Porcentaje:Q", stack="normalize", axis=alt.Axis(format=".2%")),
+        color=alt.Color(
+            "Estado de acceso:N",
+            legend=alt.Legend(title="Estado de acceso"),
+            scale=alt.Scale(
+                domain=["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"],
+                range=["#50B4C7", "#ED7D31"],
+            ),
+        ),
+        order=alt.Order("Estado de acceso:N"),
+        #tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"), "PROVINCIA", "POBLACION"],
+    )
+    .properties(
+        title="BRECHAS A CUBRIR ACCESO A AGUA POTABLE POR PROVINCIA EN APURIMAC",
+        width=600,
+        height=400,
+    )
+)
+
+# Show the main chart
+st.altair_chart(chart, use_container_width=True)
+
+# Sort the data by "VIVIENDAS CON LUZ %_d" for district chart
+g_dist_agua = g_dist_agua.sort_values("% VIVIENDAS CON ACCESO")
+
+# Add a subheader and display the selected province's district bar chart
+selected_province = st.selectbox("Seleccione una provincia", g_prov_agua["PROVINCIA"])
+selected_province_data = g_dist_agua[g_dist_agua["PROVINCIA"] == selected_province]
+
+st.subheader(f"Brecha de agua potable por cubrir en {selected_province}")
+chart_data = pd.melt(selected_province_data, id_vars=["DISTRITO","POBLACION"], value_vars=["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"], var_name="Estado de acceso", value_name="Porcentaje")
+chart_data["Porcentaje"] = chart_data["Porcentaje"].astype(float) / 100.0
+bar_chart = alt.Chart(chart_data).mark_bar().encode(
+    x=alt.X("Porcentaje:Q", stack="normalize", axis=alt.Axis(format=".2%")),
+    y=alt.Y("DISTRITO:N", sort="-x"),
+    color=alt.Color(
+        "Estado de acceso:N",
+        legend=alt.Legend(title="Estado de acceso"),
+        scale=alt.Scale(
+            domain=["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"],
+            range=["#50B4C7", "#ED7D31"],
+        ),
+    ),
+    order=alt.Order("Estado de acceso:N"),
+    tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"), "DISTRITO", "POBLACION"]
+).properties(width=600, height=400)
+
+st.altair_chart(bar_chart, use_container_width=True)
+
+
+
+    
