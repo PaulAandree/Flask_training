@@ -81,7 +81,7 @@ bar_chart = alt.Chart(chart_data).mark_bar().encode(
             range=["#50B4C7", "#ED7D31"],
         ),
     ),
-    tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"),"DISTRITO", "POBLACION". "VIVIENDAS"]
+    tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"),"DISTRITO", "POBLACION", "VIVIENDAS"]
 ).properties(width=600, height=400)
 
 st.altair_chart(bar_chart, use_container_width=True)
