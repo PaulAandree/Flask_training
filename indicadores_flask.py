@@ -3,7 +3,7 @@ import altair as alt
 import pandas as pd
 
 # Define the data
-data = pd.read_csv(r"E:\\_02_practicas_region_apurimac\\Tareas_sub gerente(David )\\Tarea_03 - indicadores\\Apurimac.csv")
+data = pd.read_csv(r"Apurimac.csv")
 
 g_prov = data.groupby("PROVINCIA").sum().reset_index()
 g_dist = data.groupby(["PROVINCIA", "DISTRITO"]).sum().reset_index()
