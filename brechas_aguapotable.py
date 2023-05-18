@@ -25,7 +25,7 @@ g_prov_agua = g_prov_agua.sort_values("% VIVIENDAS CON ACCESO")
 
 # Transform the data for the main chart
 folded_data = g_prov_agua.melt(
-    id_vars=["PROVINCIA","POBLACION"],
+    id_vars=["PROVINCIA","POBLACION","VIVIENDAS"],
     value_vars=["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"],
     var_name="Estado de acceso",
     value_name="Porcentaje"
@@ -47,7 +47,7 @@ chart = (
             ),
         ),
         order=alt.Order("Estado de acceso:N"),
-        tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"), "PROVINCIA", "POBLACION"],
+        tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"), "PROVINCIA", "POBLACION", "VIVIENDAS"],
     )
     .properties(
         title="BRECHAS A CUBRIR ACCESO A AGUA POTABLE POR PROVINCIA EN APURIMAC",
@@ -67,7 +67,7 @@ selected_province = st.selectbox("Seleccione una provincia", g_prov_agua["PROVIN
 selected_province_data = g_dist_agua[g_dist_agua["PROVINCIA"] == selected_province]
 
 st.subheader(f"Brecha de agua potable por cubrir en {selected_province}")
-chart_data = pd.melt(selected_province_data, id_vars=["DISTRITO", "POBLACION"], value_vars=["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"], var_name="Estado de acceso", value_name="Porcentaje")
+chart_data = pd.melt(selected_province_data, id_vars=["DISTRITO", "POBLACION", "VIVIENDAS"], value_vars=["% VIVIENDAS CON ACCESO", "% VIVIENDAS SIN ACCESO"], var_name="Estado de acceso", value_name="Porcentaje")
 chart_data["Porcentaje"] = chart_data["Porcentaje"].astype(float) / 100.0
 
 bar_chart = alt.Chart(chart_data).mark_bar().encode(
@@ -81,7 +81,7 @@ bar_chart = alt.Chart(chart_data).mark_bar().encode(
             range=["#50B4C7", "#ED7D31"],
         ),
     ),
-    tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"),"DISTRITO", "POBLACION"]
+    tooltip=["Estado de acceso", alt.Tooltip("Porcentaje:Q", format=".2%"),"DISTRITO", "POBLACION". "VIVIENDAS"]
 ).properties(width=600, height=400)
 
 st.altair_chart(bar_chart, use_container_width=True)
