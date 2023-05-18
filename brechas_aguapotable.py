@@ -4,7 +4,7 @@ import pandas as pd
 import altair_saver
 
 # Define the data
-data = pd.read_csv(r"E:\\_02_practicas_region_apurimac\\Tareas_sub gerente(David )\\Tarea_07_brechas de Saneamiento\\Apurimac_aguapotable.csv")
+data = pd.read_csv(r"Apurimac_aguapotable.csv")
 
 g_prov_agua = data.groupby("PROVINCIA").sum().reset_index()
 g_dist_agua = data.groupby(["PROVINCIA", "DISTRITO"]).sum().reset_index()
