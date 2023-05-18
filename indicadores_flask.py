@@ -14,12 +14,15 @@ b_p = 100 - a_p
 a_d = round(g_dist["VIVIENDAS CON LUZ"] / (g_dist["VIVIENDAS CON LUZ"] + g_dist["VIVIENDAS SIN LUZ"]) * 100, 2)
 b_d = 100 - a_d
 
-g_prov["VIVIENDAS CON LUZ %"]   = a_p.astype(str)
-g_prov["VIVIENDAS SIN LUZ %"]   = b_p.astype(str)
-g_dist["VIVIENDAS CON LUZ %_d"] = a_d.astype(str)
-g_dist["VIVIENDAS SIN LUZ %_d"] = b_d.astype(str)
+g_prov["VIVIENDAS CON LUZ %"]   = a_p
+g_prov["VIVIENDAS SIN LUZ %"]   = b_p
+g_dist["VIVIENDAS CON LUZ %_d"] = a_d
+g_dist["VIVIENDAS SIN LUZ %_d"] = b_d
 
-# Create the chart using Altair
+# Sort the data by "VIVIENDAS CON LUZ %" for province chart
+g_prov = g_prov.sort_values("VIVIENDAS CON LUZ %")
+
+# Create the main chart using Altair
 chart = (
     alt.Chart(g_prov)
     .transform_fold(
@@ -47,35 +50,31 @@ chart = (
     )
 )
 
-# Add a multi-selection event handler for the scatter plot
-click = alt.selection_multi(fields=["PROVINCIA"])
+# Show the main chart
+st.altair_chart(chart, use_container_width=True)
 
-# Apply the selection to the scatter plot
-chart = chart.add_selection(click)
+# Sort the data by "VIVIENDAS CON LUZ %_d" for district chart
+g_dist = g_dist.sort_values("VIVIENDAS CON LUZ %_d")
 
-# Create a bar chart that displays the districts 
-bar = (
-    alt.Chart(g_dist)
-    .transform_fold(
-        ["VIVIENDAS CON LUZ %", "VIVIENDAS SIN LUZ %"],
-        as_=["Estado de acceso", "Porcentaje"],
-    )
-    .mark_bar()
-    .encode(
-        y=alt.Y("DISTRITO:N", sort="-x"),
-        x=alt.X("Porcentaje:Q", stack="normalize", axis=alt.Axis(format=".2%")),
-        color=alt.Color(
-            "Estado de acceso:N",
-            legend=alt.Legend(title="Estado de acceso"),
-            scale=alt.Scale(
-                domain=["VIVIENDAS CON LUZ %", "VIVIENDAS SIN LUZ %"],
-                range=["#50B4C7", "#ED7D31"],)
-        )
-        
-).transform_filter(click)
-)
+# Add a subheader and display the selected province's district bar chart
+selected_province = st.selectbox("Select a province", g_prov["PROVINCIA"])
+selected_province_data = g_dist[g_dist["PROVINCIA"] == selected_province]
 
-combined_chart = alt.hconcat(chart, bar)
+st.subheader(f"District Bar Chart for {selected_province}")
+chart_data = pd.melt(selected_province_data, id_vars=["DISTRITO"], value_vars=["VIVIENDAS CON LUZ %_d", "VIVIENDAS SIN LUZ %_d"], var_name="Estado de acceso", value_name="Porcentaje")
+chart_data["Porcentaje"] = chart_data["Porcentaje"].astype(float) / 100.0
+bar_chart = alt.Chart(chart_data).mark_bar().encode(
+    x=alt.X("Porcentaje:Q", stack="normalize", axis=alt.Axis(format=".2%")),
+    y=alt.Y("DISTRITO:N", sort="-x"),
+    color=alt.Color(
+        "Estado de acceso:N",
+        legend=alt.Legend(title="Estado de acceso"),
+        scale=alt.Scale(
+            domain=["VIVIENDAS CON LUZ %_d", "VIVIENDAS SIN LUZ %_d"],
+            range=["#50B4C7", "#ED7D31"],
+        ),
+    ),
+    order=alt.Order("Estado de acceso:N")
+).properties(width=600, height=400)
 
-#show it on stremlit
-st.altair_chart(combined_chart, use_container_width=True)
+st.altair_chart(bar_chart, use_container_width=True)
