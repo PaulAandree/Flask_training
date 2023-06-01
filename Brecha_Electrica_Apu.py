@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-df = pd.read_csv(r"E:\\_02_practicas_region_apurimac\\Tareas sub gerencia (David)\\Tarea_03 - indicadores\\Apurimac.csv", encoding='utf-8')
+df = pd.read_csv("Apurimac.csv", encoding='utf-8')
 
 # Function to calculate "% VIVIENDAS CON ACCESO" and "% VIVIENDAS SIN ACCESO" columns
 def calculate_access_percentage(df):
