@@ -8,7 +8,7 @@ df = pd.read_csv("Apurimac.csv", encoding='utf-8')
 
 
 uploaded_file = st.file_uploader("Upload external.csv", type="csv")
-repo_path = '/PaulAandree/Flask_training/edit/reporting_training_'  # Replace with your GitHub repository folder path
+repo_path = '/Flask_training/edit/reporting_training_'  # Replace with your GitHub repository folder path
 
 if uploaded_file is not None:
     with open(uploaded_file.name, 'wb') as f:
