@@ -2,4 +2,4 @@ pandas
 streamlit
 altair
 altair_saver
-repo
+git
