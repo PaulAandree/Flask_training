@@ -2,4 +2,3 @@ pandas
 streamlit
 altair
 altair_saver
-from git import repo
