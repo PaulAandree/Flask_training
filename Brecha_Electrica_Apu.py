@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-from gitpython import Repo
+from git import Repo
 
 df = pd.read_csv("Apurimac.csv", encoding='utf-8')
 
