@@ -2,24 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-from git import Repo
-
 df = pd.read_csv("Apurimac.csv", encoding='utf-8')
-
-
-uploaded_file = st.file_uploader("Upload external.csv", type="csv")
-repo_path = 'reporting_training_'  # Replace with your GitHub repository folder path
-
-if uploaded_file is not None:
-    with open(uploaded_file.name, 'wb') as f:
-        f.write(uploaded_file.getvalue())
-
-    repo = Repo(repo_path)
-    repo.index.add([uploaded_file.name])
-    repo.index.commit("Added external.csv")
-
-    st.success("external.csv uploaded and saved to the repository folder")
-    
 
 # Function to calculate "% VIVIENDAS CON ACCESO" and "% VIVIENDAS SIN ACCESO" columns
 def calculate_access_percentage(df):
